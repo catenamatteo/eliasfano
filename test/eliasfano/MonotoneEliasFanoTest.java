@@ -1,6 +1,6 @@
 package eliasfano;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,7 +12,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class EliasFanoGetTest {
+public class MonotoneEliasFanoTest {
 
 	@Parameters
     public static Collection<int[]> data() {
@@ -25,7 +25,7 @@ public class EliasFanoGetTest {
         	{0,1,2,3,4},
         	{0,Byte.MAX_VALUE,Short.MAX_VALUE,Integer.MAX_VALUE},
         	{0,1,Byte.MAX_VALUE-1,Byte.MAX_VALUE,Byte.MAX_VALUE+1,Short.MAX_VALUE-1,Short.MAX_VALUE,Short.MAX_VALUE+1,Integer.MAX_VALUE-1,Integer.MAX_VALUE},
-        	{0, 0 , 0, Byte.MAX_VALUE, Byte.MAX_VALUE, Byte.MAX_VALUE}
+        	{0, 0, 0, Byte.MAX_VALUE, Byte.MAX_VALUE, Byte.MAX_VALUE}
            });
     }
     
@@ -33,12 +33,25 @@ public class EliasFanoGetTest {
     public int[] param;
 	
 	@Test
-	public void basicTest() {
+	public void getTest() {
 		
 		EliasFanoWriter efw = new EliasFanoWriter();
 		byte[] comp = efw.compress(param, 0, param.length);
 		EliasFanoReader efr = new EliasFanoReader(comp, param[param.length-1], param.length);
 		for (int i = 0; i < param.length; i++) assertEquals(param[i], efr.get(i));
+	}
+	
+	@Test
+	public void decompressTest() {
+		
+		EliasFanoWriter efw = new EliasFanoWriter();
+		byte[] comp = efw.compress(param, 0, param.length);
+		EliasFanoReader efr = new EliasFanoReader(comp, param[param.length-1], param.length);
+		int[] decom = new int[param.length];
+		efr.decompress(0, param.length, decom, 0);
+		assertArrayEquals(param, decom);
+		
+		
 	}
 
 }

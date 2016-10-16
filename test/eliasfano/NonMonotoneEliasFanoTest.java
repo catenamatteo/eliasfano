@@ -9,7 +9,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 
 @RunWith(Parameterized.class)
@@ -31,7 +31,7 @@ public class NonMonotoneEliasFanoTest {
 	}
 	
 	@Test
-	public void basicTest() {
+	public void getTest() {
 		
 		int[] copy = Arrays.copyOf(param, param.length);
 		copy[0] = param[0];
@@ -41,6 +41,20 @@ public class NonMonotoneEliasFanoTest {
 		EliasFanoReader efr = new EliasFanoReader(comp, copy[copy.length-1], copy.length);
 		assertEquals(param[0], efr.get(0));
 		for (int i = 1; i < param.length; i++) assertEquals(param[i], efr.get(i)-efr.get(i-1));
+	}
+	
+	@Test
+	public void decompressTest() {
+		
+		int[] copy = Arrays.copyOf(param, param.length);
+		copy[0] = param[0];
+		for (int i = 1; i < copy.length; i++) copy[i] = param[i]+copy[i-1];
+		EliasFanoWriter efw = new EliasFanoWriter();
+		byte[] comp = efw.compress(copy, 0, copy.length);
+		EliasFanoReader efr = new EliasFanoReader(comp, copy[copy.length-1], copy.length);
+		int[] b = new int[copy.length];
+		efr.decompress(0, copy.length, b, 0);
+		assertArrayEquals(copy, b);
 	}
 
 }

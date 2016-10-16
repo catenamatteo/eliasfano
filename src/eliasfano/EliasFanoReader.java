@@ -1,5 +1,6 @@
 package eliasfano;
 
+import java.util.Arrays;
 import java.util.BitSet;
 
 public class EliasFanoReader {
@@ -15,6 +16,34 @@ public class EliasFanoReader {
 		l = (int) Math.max(0, Math.ceil(Math.log10((double)u/(double)len) / Math.log10(2)));
 		higherOffset = l * len;
 		this.len = len;
+	}
+	
+	public void decompress(int inOffset, int len, int[] out, int outOffset) {
+		
+		int prevPos = -1;
+		int high = 0;
+		for (int j = 0; j < inOffset; j++) {
+			
+			int pos = bitSet.nextSetBit(higherOffset + prevPos + 1) - higherOffset;
+			high += pos - prevPos - 1;
+			prevPos = pos;
+		}
+		
+		for (int j = 0; j < len; j++) {
+			
+			int low = 0;
+			for (int i = 0; i < l; i++) {
+				
+				boolean bit = bitSet.get(((inOffset + j) * l) + i);
+				if (bit) low |= (1 << i);
+			}
+			
+			int pos = bitSet.nextSetBit(higherOffset + prevPos + 1) - higherOffset;
+			high += pos - prevPos - 1;
+			prevPos = pos;
+			
+			out[outOffset + j] = (high << l) | low;
+		}
 	}
 	
 	public int get(int idx) {
@@ -102,6 +131,9 @@ public class EliasFanoReader {
 		System.out.println(efr.rank(1000));
 		System.out.println(efr.rank(1002));
 		System.out.println(efr.rank(2001));
+		int[] b = new int[a.length];
+		efr.decompress(1, a.length-1, b, 0);
+		System.out.println(Arrays.toString(b));
 
 	}
 }

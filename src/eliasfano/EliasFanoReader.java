@@ -1,6 +1,5 @@
 package eliasfano;
 
-import java.util.Arrays;
 import java.util.BitSet;
 
 public class EliasFanoReader {
@@ -113,27 +112,5 @@ public class EliasFanoReader {
 		}
 		
 		return cnt;
-	}
-	
-	public static void main(String argv[]) {
-		
-		EliasFanoWriter efw = new EliasFanoWriter();
-		int[] a = {1, 2, 3, 5, 1000, 1000, 1002};
-		byte[] comp = efw.compress(a, 0, a.length);
-		EliasFanoReader efr = new EliasFanoReader(comp, 1002, a.length);
-		for (int i = 0; i < a.length; i++) System.out.println(efr.get(i));
-		System.out.println(efr.select(0));
-		System.out.println(efr.select(1001));
-		System.out.println(efr.select(2001));
-		System.out.println(efr.rank(0));
-		System.out.println(efr.rank(1));
-		System.out.println(efr.rank(5));
-		System.out.println(efr.rank(1000));
-		System.out.println(efr.rank(1002));
-		System.out.println(efr.rank(2001));
-		int[] b = new int[a.length];
-		efr.decompress(1, a.length-1, b, 0);
-		System.out.println(Arrays.toString(b));
-
 	}
 }

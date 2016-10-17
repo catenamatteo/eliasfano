@@ -50,8 +50,87 @@ public class MonotoneEliasFanoTest {
 		int[] decom = new int[param.length];
 		efr.decompress(0, param.length, decom, 0);
 		assertArrayEquals(param, decom);
+	}
+	
+	/*
+	 * Test if select returns the same position of a linear scan
+	 */
+	@Test
+	public void selectTest1() {
 		
+		EliasFanoWriter efw = new EliasFanoWriter();
+		byte[] comp = efw.compress(param, 0, param.length);
+		EliasFanoReader efr = new EliasFanoReader(comp, param[param.length-1], param.length);
+		for (int i = 0; i < param.length; i++) {
+			int pos1 = -1;
+			for (int j = 0; j < param.length; j++) 
+				if (param[j]==param[i]) {
+					pos1 = j;
+					break;
+				}
+			assertEquals(pos1, efr.select(param[i]));
+		}
+	}
+	
+	/*
+	 * Test if select returns the same position of a linear scan, for missing
+	 * values 
+	 */
+	@Test
+	public void selectTest2() {
+		
+		EliasFanoWriter efw = new EliasFanoWriter();
+		byte[] comp = efw.compress(param, 0, param.length);
+		EliasFanoReader efr = new EliasFanoReader(comp, param[param.length-1], param.length);
+		int val = Integer.MAX_VALUE;
+		int pos = -1;
+		for (int i = 0; i < param.length; i++) {
+			if (param[i] >= val) {
+				pos = i;
+				break;
+			}
+		}
+		assertEquals(pos, efr.select(val));
 		
 	}
+	
+	/*
+	 * Test if rank returns the same count of a linear scan
+	 */
+	@Test
+	public void rankTest() {
+		
+		EliasFanoWriter efw = new EliasFanoWriter();
+		byte[] comp = efw.compress(param, 0, param.length);
+		EliasFanoReader efr = new EliasFanoReader(comp, param[param.length-1], param.length);
+		for (int i = 0; i < param.length; i++) {
+			int cnt = 0;
+			for (int j = 0; j < param.length; j++) 
+				if (param[j]==param[i]) {
+					cnt++;
+				}
+			assertEquals(cnt, efr.rank(param[i]));
+		}
+	}
+	
+	/*
+	 * Test if rank returns the same count of a linear scan, for
+	 * possibly missing values
+	 */
+	@Test
+	public void rankTest2() {
+		
+		EliasFanoWriter efw = new EliasFanoWriter();
+		byte[] comp = efw.compress(param, 0, param.length);
+		EliasFanoReader efr = new EliasFanoReader(comp, param[param.length-1], param.length);
+		int val = Integer.MAX_VALUE;
+		int cnt = 0;
+		for (int i = 0; i < param.length; i++) 
+			if (param[i]==val) {
+				cnt++;
+			}
+		assertEquals(cnt, efr.rank(val));
+	}
+
 
 }

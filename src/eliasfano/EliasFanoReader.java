@@ -50,6 +50,29 @@ public class EliasFanoReader {
 //		}
 //	}
 	
+	public int decompress(byte[] in, int inOffset, int u, int len, int[] out, int outOffset) {
+
+		int l = (int) Math.max(0, Math.ceil(Math.log10((double)u/(double)len) / Math.log10(2)));
+		int lowerBitsOffset = inOffset;
+		int higherBitsOffset = inOffset + (l * len);
+		if (higherBitsOffset % 8 != 0) higherBitsOffset += 8 - (higherBitsOffset % 8); //padding
+
+		int delta = 0;
+		for (int i = 0; i < len; i++) {
+			
+			int low = bits.readBinary(in, lowerBitsOffset, l);
+			int high = bits.readUnary(in, higherBitsOffset);
+			delta += high;
+			out[outOffset + i] = (delta << l) | low;
+			lowerBitsOffset += l;
+			higherBitsOffset += high + 1;
+		}
+		
+		int size = higherBitsOffset;
+		if (higherBitsOffset % 8 != 0) size += 8 - (higherBitsOffset % 8);
+		return size / 8;
+	}
+	
 	public int get(byte[] in, int inOffset, int u, int len, int idx) {
 		
 		int l = (int) Math.max(0, Math.ceil(Math.log10((double)u/(double)len) / Math.log10(2)));

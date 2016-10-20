@@ -42,16 +42,17 @@ public class MonotoneEliasFanoTest {
 		for (int i = 0; i < param.length; i++) assertEquals(param[i], efr.get(comp, 0, param[param.length - 1], param.length, i));
 	}
 	
-//	@Test
-//	public void decompressTest() {
-//		
-//		EliasFanoWriter efw = new EliasFanoWriter();
-//		byte[] comp = efw.compress(param, 0, param.length);
-//		EliasFanoReader efr = new EliasFanoReader(comp, param[param.length-1], param.length);
-//		int[] decom = new int[param.length];
-//		efr.decompress(0, param.length, decom, 0);
-//		assertArrayEquals(param, decom);
-//	}
+	@Test
+	public void decompressTest() {
+		
+		EliasFanoWriter efw = new EliasFanoWriter();
+		byte[] comp = new byte[efw.getSafeCompressedLength(param, 0, param.length)];
+		efw.compress(param, 0, param.length, comp, 0, true);
+		EliasFanoReader efr = new EliasFanoReader();
+		int[] decom = new int[param.length];
+		efr.decompress(comp, 0, param[param.length - 1], param.length, decom, 0);
+		assertArrayEquals(param, decom);
+	}
 //	
 //	/*
 //	 * Test if select returns the same position of a linear scan

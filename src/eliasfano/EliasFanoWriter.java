@@ -40,9 +40,9 @@ public class EliasFanoWriter {
 		}
 	}
 
-	public int getSafeCompressedLength(int[] param, int i, int length) {
+	public int getSafeCompressedLength(int[] in, int inOffset, int length) {
 		
-		int u = param[i+length-1];
+		int u = in[inOffset+length-1];
 		int l = (int) Math.max(0, Math.ceil(Math.log10((double)u/(double)length) / Math.log10(2.0)));
 		int bitSize = (2 + l) * length;
 		if (bitSize % 8 != 0) bitSize += 8 - (bitSize % 8);

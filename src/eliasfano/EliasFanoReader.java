@@ -8,47 +8,6 @@ public class EliasFanoReader {
 		
 		bits = new Bits();
 	}
-
-
-//	public EliasFanoReader(byte[] in, int inOffset, int u, int len) {
-//		
-//		l = (int) Math.max(0, Math.ceil(Math.log10((double)u/(double)len) / Math.log10(2)));
-//		lowerOffset = inOffset;
-//		higherOffset = l * len;
-//		this.len = len;
-//	}
-//	
-//	public void decompress(byte[] in, int inOffset, int u, int len, int[] out, int outOffset, int numval) {
-//
-//		int l = (int) Math.max(0, Math.ceil(Math.log10((double)u/(double)len) / Math.log10(2)));
-//		int lowerOffset = inOffset;
-//		int higherOffset = inOffset + (l * len);
-//
-//		int prevPos = -1;
-//		int high = 0;
-//		for (int j = 0; j < inOffset; j++) {
-//			
-//			int pos = bitSet.nextSetBit(higherOffset + prevPos + 1) - higherOffset;
-//			high += pos - prevPos - 1;
-//			prevPos = pos;
-//		}
-//		
-//		for (int j = 0; j < len; j++) {
-//			
-//			int low = 0;
-//			for (int i = 0; i < l; i++) {
-//				
-//				boolean bit = bitSet.get(((inOffset + j) * l) + i);
-//				if (bit) low |= (1 << i);
-//			}
-//			
-//			int pos = bitSet.nextSetBit(higherOffset + prevPos + 1) - higherOffset;
-//			high += pos - prevPos - 1;
-//			prevPos = pos;
-//			
-//			out[outOffset + j] = (high << l) | low;
-//		}
-//	}
 	
 	public int decompress(byte[] in, int inOffset, int u, int len, int[] out, int outOffset) {
 
@@ -78,7 +37,7 @@ public class EliasFanoReader {
 		int l = (int) Math.max(0, Math.ceil(Math.log10((double)u/(double)len) / Math.log10(2)));
 		int lowerBitsOffset = inOffset;
 		int higherBitsOffset = inOffset + (l * len);
-		if (higherBitsOffset % 8 != 0) higherBitsOffset += 8 - (higherBitsOffset % 8); //padding
+		if (higherBitsOffset % Byte.SIZE != 0) higherBitsOffset += Byte.SIZE - (higherBitsOffset % Byte.SIZE); //padding
 		
 		int low = bits.readBinary(in, lowerBitsOffset + (l * idx), l);
 		
@@ -106,52 +65,60 @@ public class EliasFanoReader {
 		return (high << l) | low;
 	}
 	
-//	public int select(int x) {
-//		
-//		int h = x >>> l;
-//
-//		int idx = 0;
-//		int prevPos = -1;
-//		int high = 0;
-//		for (; idx < len + 1; idx++) {
-//			
-//			int pos = bitSet.nextSetBit(higherOffset + prevPos + 1) - higherOffset;
-//			high += pos - prevPos - 1;
-//			prevPos = pos;
-//			if (high >= h) break;
-//		}
-//		
-//		for (int i = idx; i < len; i++) {
-//			
-//			if (get(i)>=x) return i;
-//			
-//		}
-//		
-//		return -1;
-//	}
-//	
-//	public int rank(int x) {
-//		
-//		int h = x >>> l;
-//
-//		int idx = 0;
-//		int prevPos = -1;
-//		int high = 0;
-//		for (; idx < len + 1; idx++) {
-//			
-//			int pos = bitSet.nextSetBit(higherOffset + prevPos + 1) - higherOffset;
-//			high += pos - prevPos - 1;
-//			prevPos = pos;
-//			if (high >= h) break;
-//		}
-//		
-//		int cnt = 0;
-//		for (int i = idx; i < len; i++) {
-//			
-//			if (get(i)==x) cnt++;
-//			
-//		}
-//		
-//		return cnt;
-//	}
+	public int select(byte[] in, int inOffset, int u, int len, int val) {
+		
+		int l = (int) Math.max(0, Math.ceil(Math.log10((double)u/(double)len) / Math.log10(2)));
+		int higherBitsOffset = inOffset + (l * len);
+		if (higherBitsOffset % Byte.SIZE != 0) higherBitsOffset += Byte.SIZE - (higherBitsOffset % Byte.SIZE); //padding
+		
+		int h = val >>> l;
+		
+		int higherBytesOffset = higherBitsOffset / Byte.SIZE; //thanks to padding
+		int prev_1Bits = 0;
+		int _0Bits = 0;
+		int _1Bits = 0;
+		while (_0Bits < h && prev_1Bits < len) {
+			
+			prev_1Bits = _1Bits;
+			if (prev_1Bits >= len) break;
+			int pc = bits.bitCount(0xFF & (in[higherBytesOffset++]));
+			_1Bits += pc;
+			_0Bits += Byte.SIZE - pc;
+		}
+		
+		for (int i = prev_1Bits; i < len; i++)
+			if (get(in, inOffset, u, len, i)>=val) return i;
+		
+		return -1;
+		
+	}
+	
+	public int rank(byte[] in, int inOffset, int u, int len, int val) {
+		
+		int idx = select(in, inOffset, u, len, val);
+		
+		if (idx == -1) {
+		
+			return 0;
+		
+		} else {
+			
+			int cnt = 1;
+			
+			for (int i = idx+1; i < len; i++) {
+				
+				if (get(in, inOffset, u, len, i) == val) {
+					
+					cnt++;
+					
+				} else {
+					
+					break;
+				}
+				
+			}
+		
+			return cnt;
+		}
+	}
 }

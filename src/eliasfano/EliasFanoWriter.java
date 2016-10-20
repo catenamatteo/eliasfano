@@ -9,7 +9,7 @@ public class EliasFanoWriter {
 		bits = new Bits();
 	}
 	
-	public void compress(int[] in, int inOffset, int len, byte[] out, int outOffset, boolean monotonicityTest) {
+	public int compress(int[] in, int inOffset, int len, byte[] out, int outOffset, boolean monotonicityTest) {
 		
 		if (monotonicityTest)
 			for (int i = inOffset+1; i < len; i++)
@@ -19,7 +19,7 @@ public class EliasFanoWriter {
 		int u = in[inOffset + len - 1];
 		int l = (int) Math.max(0, Math.ceil(Math.log10((double)u/(double)len) / Math.log10(2.0)));
 		
-		int bitOffset = outOffset;
+		int bitOffset = outOffset * Byte.SIZE;
 		
 		for (int i = 0; i < len; i++) {
 			
@@ -38,6 +38,13 @@ public class EliasFanoWriter {
 			bitOffset += (high - prev) + 1;
 			prev = high;
 		}
+		
+		int numLowerBits = l * len;
+		if (numLowerBits % 8 != 0) numLowerBits += 8 - (numLowerBits % 8);
+		int numHighBits = 2 * len;
+		if (numHighBits % 8 != 0) numHighBits += 8 - (numHighBits % 8);
+
+		return (numLowerBits + numHighBits) / 8;
 	}
 
 	public int getSafeCompressedLength(int[] in, int inOffset, int length) {

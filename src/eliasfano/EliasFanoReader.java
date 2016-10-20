@@ -12,8 +12,8 @@ public class EliasFanoReader {
 	public int decompress(byte[] in, int inOffset, int u, int len, int[] out, int outOffset) {
 
 		int l = (int) Math.max(0, Math.ceil(Math.log10((double)u/(double)len) / Math.log10(2)));
-		int lowerBitsOffset = inOffset;
-		int higherBitsOffset = inOffset + (l * len);
+		int lowerBitsOffset = inOffset * Byte.SIZE;
+		int higherBitsOffset = lowerBitsOffset + (l * len);
 		if (higherBitsOffset % 8 != 0) higherBitsOffset += 8 - (higherBitsOffset % 8); //padding
 
 		int delta = 0;
@@ -25,6 +25,7 @@ public class EliasFanoReader {
 			out[outOffset + i] = (delta << l) | low;
 			lowerBitsOffset += l;
 			higherBitsOffset += high + 1;
+			System.err.println(high);
 		}
 		
 		int size = higherBitsOffset;
@@ -35,8 +36,8 @@ public class EliasFanoReader {
 	public int get(byte[] in, int inOffset, int u, int len, int idx) {
 		
 		int l = (int) Math.max(0, Math.ceil(Math.log10((double)u/(double)len) / Math.log10(2)));
-		int lowerBitsOffset = inOffset;
-		int higherBitsOffset = inOffset + (l * len);
+		int lowerBitsOffset = inOffset * Byte.SIZE;
+		int higherBitsOffset = lowerBitsOffset + (l * len);
 		if (higherBitsOffset % Byte.SIZE != 0) higherBitsOffset += Byte.SIZE - (higherBitsOffset % Byte.SIZE); //padding
 		
 		int low = bits.readBinary(in, lowerBitsOffset + (l * idx), l);
@@ -68,7 +69,7 @@ public class EliasFanoReader {
 	public int select(byte[] in, int inOffset, int u, int len, int val) {
 		
 		int l = (int) Math.max(0, Math.ceil(Math.log10((double)u/(double)len) / Math.log10(2)));
-		int higherBitsOffset = inOffset + (l * len);
+		int higherBitsOffset = (inOffset * Byte.SIZE) + (l * len);
 		if (higherBitsOffset % Byte.SIZE != 0) higherBitsOffset += Byte.SIZE - (higherBitsOffset % Byte.SIZE); //padding
 		
 		int h = val >>> l;

@@ -11,6 +11,8 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
+import me.lemire.integercompression.synth.ClusteredDataGenerator;
+
 @RunWith(Parameterized.class)
 public class MonotoneEliasFanoTest {
 
@@ -138,5 +140,24 @@ public class MonotoneEliasFanoTest {
 		assertEquals(cnt, efr.rank(comp, 0, param[param.length-1], param.length, val));
 	}
 
-
+	@Test
+	public void randomTest() {
+		
+		ClusteredDataGenerator cdg = new ClusteredDataGenerator();
+		int[] data = cdg.generateClustered(262143, 524287);
+		EliasFanoWriter efw = new EliasFanoWriter();
+		byte[] comp = new byte[efw.getSafeCompressedLength(data, 0, data.length)];
+		efw.compress(data, 0, data.length, comp, 0, true);
+		EliasFanoReader efr = new EliasFanoReader();
+		int[] decom = new int[data.length];
+		efr.decompress(comp, 0, data[data.length - 1], data.length, decom, 0);
+		assertArrayEquals(data, decom);
+		data = cdg.generateClustered(262143, 524287);
+		Arrays.fill(comp, (byte)0); //TODO: solve this...otherwise you can't reuse array
+		efw.compress(data, 0, data.length, comp, 0, true);
+		efr.decompress(comp, 0, data[data.length - 1], data.length, decom, 0);
+		assertArrayEquals(data, decom);
+		
+	}
+	
 }

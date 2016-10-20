@@ -122,6 +122,7 @@ public class Bits {
 
 	public int readUnary(byte[] in, int bitOffset) {
 
+		try {
 		int val = 0;
 
 		while (true) {
@@ -145,6 +146,10 @@ public class Bits {
 
 			}
 
+		}} catch (ArrayIndexOutOfBoundsException e) {
+			
+			System.err.println(bitOffset);
+			return 0;
 		}
 
 	}

@@ -41,4 +41,13 @@ public class BitsTest {
 		assertEquals(1, bits.readBinary(in, 27, 1));
 	}
 	
+	@Test
+	public void testBinary2() {
+		
+		Bits bits = new Bits();
+		byte[] in = new byte[4];
+		bits.writeBinary(in, 0, 262143, Integer.SIZE);
+		assertEquals(262143, bits.readBinary(in, 0, Integer.SIZE));
+	}
+	
 }

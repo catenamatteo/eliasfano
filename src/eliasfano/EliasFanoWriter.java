@@ -44,9 +44,12 @@ public class EliasFanoWriter {
 		
 		int u = in[inOffset+length-1];
 		int l = (int) Math.max(0, Math.ceil(Math.log10((double)u/(double)length) / Math.log10(2.0)));
-		int bitSize = (2 + l) * length;
-		if (bitSize % 8 != 0) bitSize += 8 - (bitSize % 8);
-		return bitSize / 8;
+		int numLowerBits = l * length;
+		if (numLowerBits % 8 != 0) numLowerBits += 8 - (numLowerBits % 8);
+		int numHighBits = 2 * length;
+		if (numHighBits % 8 != 0) numHighBits += 8 - (numHighBits % 8);
+
+		return (numLowerBits + numHighBits) / 8;
 	}
 	
 }

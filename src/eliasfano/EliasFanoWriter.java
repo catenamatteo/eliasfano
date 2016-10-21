@@ -39,12 +39,9 @@ public class EliasFanoWriter {
 			prev = high;
 		}
 		
-		int numLowerBits = l * len;
-		if (numLowerBits % 8 != 0) numLowerBits += 8 - (numLowerBits % 8);
-		int numHighBits = 2 * len;
-		if (numHighBits % 8 != 0) numHighBits += 8 - (numHighBits % 8);
+		if (bitOffset % 8 != 0) bitOffset += 8 - (bitOffset % 8); //padding
 
-		return (numLowerBits + numHighBits) / 8;
+		return bitOffset / 8;
 	}
 
 	public int getSafeCompressedLength(int[] in, int inOffset, int length) {

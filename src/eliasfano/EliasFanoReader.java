@@ -25,7 +25,6 @@ public class EliasFanoReader {
 			out[outOffset + i] = (delta << l) | low;
 			lowerBitsOffset += l;
 			higherBitsOffset += high + 1;
-			System.err.println(high);
 		}
 		
 		int size = higherBitsOffset;

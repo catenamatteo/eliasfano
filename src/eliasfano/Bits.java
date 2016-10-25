@@ -1,136 +1,99 @@
 package eliasfano;
 
 public class Bits {
-
-	private byte[] MSB = { 8, 7, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3,
-			3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-			2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-			1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
-	private byte[] BIT_COUNT = { 0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3,
-			3, 4, 3, 4, 4, 5, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5,
-			5, 6, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 2, 3,
-			3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 1, 2, 2, 3, 2, 3,
-			3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4,
-			4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5,
-			5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5,
-			5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8 };
-
-	public void writeBinary(byte[] in, int bitOffset, int val, int numbits) {
-
-		val &= 0xFFFFFFFF >>> (32 - numbits);
+	
+	public void writeBinary(long[] in, long bitOffset, long val, int numbits) {
 		
 		while (numbits > 0) {
 
-			int byteOffset = bitOffset / 8;
-			int bitPos = bitOffset % 8;
-			int availableSpace = 8 - bitPos;
-
+			int longOffset = (int) (bitOffset / Long.SIZE);
+			int bitPosition = (int) (bitOffset % Long.SIZE);
+			int availableSpace = Long.SIZE - bitPosition;
+			int bitsToWrite = Math.min(numbits, availableSpace);
+			int shift = Math.abs(numbits - availableSpace);
+			
 			if (availableSpace < numbits) {
 
-				in[byteOffset] |= (byte) (val >>> (numbits - availableSpace));
-				val &= 0xFFFFFFFF >>> (32 - (numbits - availableSpace));
-				bitOffset += availableSpace;
-				numbits -= availableSpace;
+				in[longOffset] |= val >>> shift;
 
 			} else {
 
-				in[byteOffset] |= (byte) (val << (availableSpace - numbits));
-				val = 0;
-				bitOffset += numbits;
-				numbits = 0;
+				in[longOffset] |= val << shift;
+
 			}
+			
+			val &= 0xFFFFFFFFFFFFFFFFl >>> (Long.SIZE - shift);
+			bitOffset += bitsToWrite;
+			numbits -= bitsToWrite;
 		}
 	}
 
-	public int readBinary(byte[] in, int bitOffset, int numbits) {
+	public long readBinary(long[] in, long bitOffset, int numbits) {
 
-		int val = 0;
+		long val = 0;
 
 		while (numbits > 0) {
 
-			int byteOffset = bitOffset / 8;
-			int bitPos = bitOffset % 8;
-			int availableSpace = 8 - bitPos;
-
-			if (availableSpace < numbits) {
-
-				val <<= availableSpace;
-				val |= ((0xFF >>> bitPos) & in[byteOffset]);
-				bitOffset += availableSpace;
-				numbits -= availableSpace;
-
-			} else {
-
-				val <<= numbits;
-				val |= ((0xFF >>> bitPos) & in[byteOffset]) >>> (availableSpace - numbits);
-				bitOffset += numbits;
-				numbits = 0;
-			}
-
+			int longOffset = (int) (bitOffset / Long.SIZE);
+			int bitPosition = (int) (bitOffset % Long.SIZE);
+			int availableSpace = Long.SIZE - bitPosition;
+			int bitsToWrite = Math.min(numbits, availableSpace);
+			
+			val <<= bitsToWrite;
+			val |= ((0xFFFFFFFFFFFFFFFFl >>> bitPosition) & in[longOffset]) >>> Math.max(0, availableSpace - numbits);
+			
+			bitOffset += bitsToWrite;
+			numbits -= bitsToWrite;
 		}
 
 		return val;
 	}
 
-	public void writeUnary(byte[] in, int bitOffset, int val) {
-
+	public void writeUnary(long[] in, long bitOffset, long val) {
+		
 		while (val > 0) {
 
-			int byteOffset = bitOffset / Byte.SIZE;
-			int bitPosition = bitOffset % Byte.SIZE;
-			int availableSpace = Byte.SIZE - bitPosition;
+			int longOffset = (int) (bitOffset / Long.SIZE);
+			int bitPosition = (int) (bitOffset % Long.SIZE);
+			int availableSpace = Long.SIZE - bitPosition;
 			
-			int numZeros = Math.min(val, availableSpace);
-			int zeros = 0xFF >>> numZeros;
+			int numZeros = (int) Math.min(val, availableSpace);
+			long zeros = 0xFFFFFFFFFFFFFFFFl >>> numZeros;
 			
-			in[byteOffset] &= (zeros >>> bitPosition) | (zeros << (Byte.SIZE - bitPosition));
+			in[longOffset] &= (zeros >>> bitPosition) | (zeros << (Long.SIZE - bitPosition));
 			bitOffset += numZeros;
 			val -= numZeros;
 		}
 
-		int byteOffset = bitOffset / Byte.SIZE;
-		int bitPosition = bitOffset % Byte.SIZE;
-		in[byteOffset] |= 0b10000000 >>> bitPosition;
+		int longOffset = (int) (bitOffset / Long.SIZE);
+		int bitPosition = (int) (bitOffset % Long.SIZE);
+		in[longOffset] |= 0x8000000000000000l >>> bitPosition;
 	}
 
-	public int readUnary(byte[] in, int bitOffset) {
+	public long readUnary(long[] in, long bitOffset) {
 
-		boolean done = false;
-		int val = 0;
+		long val = 0;
 
-		while (!done) {
+		while (true) {
 
-			int byteOffset = bitOffset / Byte.SIZE;
-			int bitPos = bitOffset % Byte.SIZE;
-			int inc = 0;
+			int longOffset = (int) (bitOffset / Long.SIZE);
+			int bitPosition = (int) (bitOffset % Long.SIZE);
 
-			int x = in[byteOffset] & (0xFF >>> bitPos);
+			long x = in[longOffset] & (0xFFFFFFFFFFFFFFFFl >>> bitPosition);
 			
 			if (x == 0) {
 
-				inc = Byte.SIZE - bitPos;
+				val += Long.SIZE - bitPosition;
+				bitOffset += Long.SIZE - bitPosition;
 
 			} else {
 
-				inc = MSB[x] - bitPos;
-				done = true;
+				val += Long.numberOfLeadingZeros(x) - bitPosition;
+				break;
 
 			}
-
-			val += inc;
-			bitOffset += inc;
 		}
 		
 		return val;
-	}
-
-	public int bitCount(int val) {
-
-		return BIT_COUNT[val];
 	}
 }

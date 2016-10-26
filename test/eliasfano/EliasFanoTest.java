@@ -102,6 +102,31 @@ public class EliasFanoTest {
 	}
 	
 	@Test
+	public void testOffset() throws IOException {
+	
+		EliasFano ef = new EliasFano();
+		long[] data1 = loadLongs("resources/1000longs.txt");
+		
+		int s1 = ef.getCompressedSize(data1[data1.length-2], data1.length-2);
+		
+		long[] comp = new long[s1+1];
+		int L1 = ef.getL(data1[data1.length-2], data1.length-2);
+		ef.compress(data1, 1, data1.length-2, comp, 1);
+		
+		long[] decom1 = new long[data1.length];
+		ef.decompress(comp, 1, data1.length-2, L1, decom1, 1);
+		
+		//test decompress
+		for (int i = 1; i < data1.length - 1; i++) 
+			assertEquals(data1[i], decom1[i]);
+		
+		//test get
+		for (int i = 1; i < data1.length - 1; i++)
+			assertEquals(data1[i], ef.get(comp, 1, data1.length-2, L1, i-1));
+		
+	}
+	
+	@Test
 	public void testNonMonotone() throws IOException {
 		
 		EliasFano ef = new EliasFano();

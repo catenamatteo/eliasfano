@@ -193,10 +193,12 @@ public class EliasFano {
 		}
 	}
 
-	public int getCompressedSize(long data, int length) {
+	public int getCompressedSize(long u, int length) {
 		
-		int l = getL(data, length);
-		return (int) (roundUp((2+l) * length, Long.SIZE) / Long.SIZE);
+		int l = getL(u, length);
+		long numLowBits = roundUp(l * length, Long.SIZE);
+		long numHighBits = roundUp(2 * length, Long.SIZE);
+		return (int) ((numLowBits + numHighBits) / Long.SIZE);
 	}
 	
 }

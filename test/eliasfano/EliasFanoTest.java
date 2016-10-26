@@ -3,27 +3,50 @@ package eliasfano;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import java.util.Random;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 
 public class EliasFanoTest {
 
 	/* TODO:
-	 * 1) don't resort to random data
-	 * 3) test non monotone data
-	 * 2) test offsets
+	 * 1) test offsets
 	 */
 	
+	private int[] loadInts(String filename) throws IOException {
+		
+		BufferedReader br = new BufferedReader(new FileReader(filename));
+		List<Integer> l = new ArrayList<Integer>();
+		String line = null;
+		while ((line = br.readLine()) != null) l.add(Integer.parseInt(line));
+		int[] data = new int[l.size()];
+		for (int i = 0; i < l.size(); i++) data[i] = l.get(i);
+		br.close();
+		return data;
+	}
+
+	private long[] loadLongs(String filename) throws IOException {
+		
+		BufferedReader br = new BufferedReader(new FileReader(filename));
+		List<Long> l = new ArrayList<Long>();
+		String line = null;
+		while ((line = br.readLine()) != null) l.add(Long.parseLong(line));
+		long[] data = new long[l.size()];
+		for (int i = 0; i < l.size(); i++) data[i] = l.get(i);
+		br.close();
+		return data;
+	}
+	
 	@Test
-	public void testDecompressInt() {
+	public void testDecompressInt() throws IOException {
 	
 		EliasFano ef = new EliasFano();
-		Random r = new Random(42);
-		int[] data1 = new int[1000];
-		for (int i = 1; i < data1.length; i++) data1[i] = r.nextInt(Short.MAX_VALUE) + data1[i-1];
-		int[] data2 = new int[500];
-		for (int i = 1; i < data2.length; i++) data2[i] = r.nextInt(Short.MAX_VALUE) + data2[i-1];
+		int[] data1 = loadInts("resources/1000ints.txt");
+		int[] data2 = loadInts("resources/500ints.txt");
 		
 		int s1 = ef.getCompressedSize(data1[data1.length-1], data1.length);
 		int s2 = ef.getCompressedSize(data2[data2.length-1], data2.length);
@@ -49,14 +72,11 @@ public class EliasFanoTest {
 	}
 	
 	@Test
-	public void testDecompressLong() {
+	public void testDecompressLong() throws IOException {
 	
 		EliasFano ef = new EliasFano();
-		Random r = new Random(42);
-		long[] data1 = new long[1000];
-		for (int i = 1; i < data1.length; i++) data1[i] = r.nextInt(Integer.MAX_VALUE) + data1[i-1];
-		long[] data2 = new long[500];
-		for (int i = 1; i < data2.length; i++) data2[i] = r.nextInt(Integer.MAX_VALUE) + data2[i-1];
+		long[] data1 = loadLongs("resources/1000longs.txt");
+		long[] data2 = loadLongs("resources/500longs.txt");
 		
 		int s1 = ef.getCompressedSize(data1[data1.length-1], data1.length);
 		int s2 = ef.getCompressedSize(data2[data2.length-1], data2.length);
@@ -82,12 +102,31 @@ public class EliasFanoTest {
 	}
 	
 	@Test
-	public void testSelect() {
+	public void testNonMonotone() throws IOException {
 		
 		EliasFano ef = new EliasFano();
-		Random r = new Random(42);
-		long[] data1 = new long[1000];
-		for (int i = 1; i < data1.length; i++) data1[i] = r.nextInt(Short.MAX_VALUE) + data1[i-1];
+		
+		int[] data1 = loadInts("resources/1000ints_non_monotone.txt");
+		long[] data2 = new long[data1.length];
+		data2[0] = data1[0];
+		for (int i = 1; i < data1.length; i++) data2[i]=data1[i]+data2[i-1];
+		
+		int s2 = ef.getCompressedSize(data2[data2.length-1], data2.length);
+		
+		long[] comp = new long[s2];
+		int L2 = ef.getL(data2[data2.length-1], data2.length);
+		ef.compress(data2, 0, data2.length, comp, 0);
+		
+		assertEquals(data1[0], ef.get(comp, 0, data2.length, L2, 0));
+		for (int i = 1; i < data1.length; i++)
+			assertEquals(data1[i], ef.get(comp, 0, data2.length, L2, i)-ef.get(comp, 0, data2.length, L2, i-1));
+	}
+	
+	@Test
+	public void testSelect() throws IOException {
+		
+		EliasFano ef = new EliasFano();
+		long[] data1 = loadLongs("resources/1000longs.txt");
 
 		int s1 = ef.getCompressedSize(data1[data1.length-1], data1.length);
 		
@@ -124,17 +163,11 @@ public class EliasFanoTest {
 	}
 
 	@Test
-	public void testRank() {
+	public void testRank() throws IOException {
 		
 		EliasFano ef = new EliasFano();
-		Random r = new Random(42);
-		long[] data1 = new long[1000];
-		for (int i = 1; i < data1.length; i++) data1[i] = r.nextInt(Short.MAX_VALUE) + data1[i-1];
-		int numEquals = 20;
-		for (int i = 0; i < numEquals; i++) {
-			int idx = r.nextInt(data1.length - 1) + 1;
-			data1[idx] = data1[idx-1];
-		}
+		long[] data1 = loadLongs("resources/1000longs_with_duplicates.txt");
+		
 		int s1 = ef.getCompressedSize(data1[data1.length-1], data1.length);
 		
 		long[] comp = new long[s1];
@@ -148,8 +181,6 @@ public class EliasFanoTest {
 				
 				if (data1[i] == data1[j]) cnt++;
 			}
-			
-			if (cnt != 1) System.err.println("Ok");
 			
 			assertEquals(cnt, ef.rank(comp, 0, data1.length, L1, data1[i]));
 		}

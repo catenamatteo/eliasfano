@@ -1,4 +1,4 @@
-package eliasfano;
+package eu.nicecode.eliasfano;
 
 public class Bits {
 	

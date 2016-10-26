@@ -1,4 +1,4 @@
-package eliasfano;
+package eu.nicecode.eliasfano;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -11,11 +11,9 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class EliasFanoTest {
+import eu.nicecode.eliasfano.EliasFano;
 
-	/* TODO:
-	 * 1) test offsets
-	 */
+public class EliasFanoTest {
 	
 	private int[] loadInts(String filename) throws IOException {
 		

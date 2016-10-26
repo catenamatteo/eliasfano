@@ -1,6 +1,9 @@
-package eliasfano;
+package eu.nicecode.eliasfano;
 
 import org.junit.Test;
+
+import eu.nicecode.eliasfano.Bits;
+
 import static org.junit.Assert.*;
 
 public class BitsTest {

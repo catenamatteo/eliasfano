@@ -35,8 +35,7 @@ public class BitsTest {
 		bits.writeBinary(in, 4, 2, 3);
 		bits.writeBinary(in, 8, Short.MAX_VALUE, Short.SIZE);
 		bits.writeBinary(in, 24, Integer.MAX_VALUE, Integer.SIZE);
-		bits.writeBinary(in, 56, Long.MAX_VALUE, Long.SIZE);
-		bits.writeBinary(in, 120, Short.MAX_VALUE, Long.SIZE);
+		bits.writeBinary(in, 56, Short.MAX_VALUE, Integer.SIZE);
 		assertEquals(0, bits.readBinary(in, 0, 0));
 		assertEquals(1, bits.readBinary(in, 0, 1));
 		assertEquals(1, bits.readBinary(in, 1, 1));
@@ -44,8 +43,7 @@ public class BitsTest {
 		assertEquals(2, bits.readBinary(in, 4, 3));
 		assertEquals(Short.MAX_VALUE, bits.readBinary(in, 8, Short.SIZE));
 		assertEquals(Integer.MAX_VALUE, bits.readBinary(in, 24, Integer.SIZE));
-		assertEquals(Long.MAX_VALUE, bits.readBinary(in, 56, Long.SIZE));
-		assertEquals(Short.MAX_VALUE, bits.readBinary(in, 120, Long.SIZE));
+		assertEquals(Short.MAX_VALUE, bits.readBinary(in, 56, Integer.SIZE));
 	}
 	
 }

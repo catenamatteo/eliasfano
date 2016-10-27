@@ -2,7 +2,9 @@ package eu.nicecode.eliasfano;
 
 public class Bits {
 	
-	public void writeBinary(long[] in, long bitOffset, long val, int numbits) {
+	public void writeBinary(long[] in, long bitOffset, int val, int numbits) {
+		
+		long val2 = val;
 		
 		while (numbits > 0) {
 
@@ -14,21 +16,21 @@ public class Bits {
 			
 			if (availableSpace < numbits) {
 
-				in[longOffset] |= val >>> shift;
+				in[longOffset] |= val2 >>> shift;
 
 			} else {
 
-				in[longOffset] |= val << shift;
+				in[longOffset] |= val2 << shift;
 
 			}
 			
-			val &= 0xFFFFFFFFFFFFFFFFl >>> (Long.SIZE - shift);
+			val2 &= 0xFFFFFFFFFFFFFFFFl >>> (Long.SIZE - shift);
 			bitOffset += bitsToWrite;
 			numbits -= bitsToWrite;
 		}
 	}
 
-	public long readBinary(long[] in, long bitOffset, int numbits) {
+	public int readBinary(long[] in, long bitOffset, int numbits) {
 
 		long val = 0;
 
@@ -46,10 +48,10 @@ public class Bits {
 			numbits -= bitsToWrite;
 		}
 
-		return val;
+		return (int) val;
 	}
 
-	public void writeUnary(long[] in, long bitOffset, long val) {
+	public void writeUnary(long[] in, long bitOffset, int val) {
 		
 		while (val > 0) {
 
@@ -70,9 +72,9 @@ public class Bits {
 		in[longOffset] |= 0x8000000000000000l >>> bitPosition;
 	}
 
-	public long readUnary(long[] in, long bitOffset) {
+	public int readUnary(long[] in, long bitOffset) {
 
-		long val = 0;
+		int val = 0;
 
 		while (true) {
 

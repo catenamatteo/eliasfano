@@ -41,7 +41,7 @@ a2[0] = a1[0];
 for (int i = 1; i < a1.length; i++) a2[i]=a1[i]+a2[i-1];
 //compress a2
 int u = a2[a2.length-1]; //the max value in a2
-int size = ef.getCompressedSize(a2[a2.length-1], a2.length);
+int size = ef.getCompressedSize(u, a2.length);
 long[] compressed = new long[size];
 ef.compress(a2, 0, a2.length, compressed, 0);
 //get the original i-th value of a1, as i-th minus (i-1)-th of a2

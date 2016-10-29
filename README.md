@@ -58,4 +58,4 @@ Sebastiano Vigna, "The Revenge of Elias and Fano" ([link](http://shonan.nii.ac.j
 
 More advanced material:<br/>
 Sebastiano Vigna, "Quasi-succinct indices", WSDM'13<br/>
-Giuseppe Ottaviano and Rossano Venturini, "Partitioned Elias-Fano indexes, SIGIR'14"<br/>
+Giuseppe Ottaviano and Rossano Venturini, "Partitioned Elias-Fano indexes", SIGIR'14<br/>

@@ -53,9 +53,9 @@ int val = ef.get(compressed, 0, a2.length, L, i)-ef.get(compressed, 0, a2.length
 * JUnit 4
 
 ###References
-For a general understanding of the Elias-Fano technique, see:
-Sebastiano Vigna, The Revenge of Elias and Fano [link](http://shonan.nii.ac.jp/seminar/029/wp-content/uploads/sites/12/2013/07/Sebastiano_Shonan.pdf)
+For a general understanding of the Elias-Fano technique, see:<br/>
+Sebastiano Vigna, The Revenge of Elias and Fano [link](http://shonan.nii.ac.jp/seminar/029/wp-content/uploads/sites/12/2013/07/Sebastiano_Shonan.pdf)<br/>
 
-More advanced material:
-Sebastiano Vigna, Quasi-succinct indices, WSDM'13 
-Giuseppe Ottaviano and Rossano Venturini, Partitioned Elias-Fano indexes, SIGIR'14
+More advanced material:<br/>
+Sebastiano Vigna, Quasi-succinct indices, WSDM'13<br/>
+Giuseppe Ottaviano and Rossano Venturini, Partitioned Elias-Fano indexes, SIGIR'14<br/>

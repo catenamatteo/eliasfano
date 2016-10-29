@@ -16,12 +16,12 @@
 package eu.nicecode.eliasfano;
 
 /**
- * The EliasFano class compresses int[] arrays using the Elias-Fano compression 
- * technique. It permits to uncompress an arbitrary element for the compressed
- * date, without decompressing the whole array. Similarly, it permits to find
- * the index of the first element in the compressed data, greater or equal to a
- * given value, without decompressing the whole array.
- * 
+ * A simpl(istic) implementation of the EliasFano compression technique. This
+ * class compresses array of MONOTONICALLY INCREASING integers into (smaller)
+ * arrays of longs. It permits to uncompress an arbitrary element for the
+ * compressed data, without decompressing the whole array. Similarly, it permits
+ * to find the index of the first element in the compressed data, greater or
+ * equal to a given value, without decompressing the whole array.
  * 
  * @author Matteo Catena
  *
@@ -63,7 +63,7 @@ public class EliasFano {
 	 * into the {@code out} array, from {@code outOffset}
 	 * 
 	 * @param in
-	 *            the array to compress
+	 *            the array to compress (MONOTONICALLY INCREASING)
 	 * @param inOffset
 	 *            starting offset
 	 * @param length
@@ -102,6 +102,9 @@ public class EliasFano {
 	/**
 	 * Decompress {@code length} elements from {@code in}, starting at
 	 * {@code inOffset}, into {@code out}, starting from {@outOffset
+	 * 
+	 * 
+	 * 
 	 * }. Each element is encoded using {@code l} lower bits.
 	 * 
 	 * @param in
@@ -278,6 +281,16 @@ public class EliasFano {
 		}
 	}
 
+	/**
+	 * Returns the number of longs required to compress an array of size
+	 * {@code length} and maximum value {@code u}.
+	 * 
+	 * @param u
+	 *            the maximum value in the array to compress
+	 * @param length
+	 *            the size of the array to compress
+	 * @return the number of required longs
+	 */
 	public int getCompressedSize(int u, int length) {
 
 		int l = getL(u, length);

@@ -46,7 +46,7 @@ long[] compressed = new long[size];
 ef.compress(a2, 0, a2.length, compressed, 0);
 //get the original i-th value of a1, as i-th minus (i-1)-th of a2
 int L = ef.getL(u, a2.length);
-int val = ef.get(compressed, 0, a2.length, L, i)-ef.get(compressed, 0, a2.length, L2, i-1);
+int val = ef.get(compressed, 0, a2.length, L, i)-ef.get(compressed, 0, a2.length, L, i-1);
 ```
 
 ###Dependecies 

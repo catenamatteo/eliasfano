@@ -5,7 +5,7 @@ A simpl(istic) Java implementation of the ***Elias-Fano*** compression schema, a
 for compressing arrays of *monotonically increasing* integers. 
 The Elias-Fano compression schema permits to decompress the i-th element in the 
 compressed data, without decompressing the whole array.
-Similary, it permits to find the index of the first element in the compressed data which is
+Similarly, it permits to find the index of the first element in the compressed data which is
 greater or equal to a given value -- without decompressing the whole array.
 
 

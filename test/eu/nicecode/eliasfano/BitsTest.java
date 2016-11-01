@@ -31,7 +31,7 @@ public class BitsTest {
 	public void testUnary() {
 		
 		Bits bits = new Bits();
-		long[] in = new long[4];
+		byte[] in = new byte[32];
 		bits.writeUnary(in, 0, 0);
 		bits.writeUnary(in, 1, 1);
 		bits.writeUnary(in, 3, 2);
@@ -46,7 +46,7 @@ public class BitsTest {
 	public void testBinary() {
 		
 		Bits bits = new Bits();
-		long[] in = new long[4];
+		byte[] in = new byte[32];
 		bits.writeBinary(in, 0, 0, 0);
 		bits.writeBinary(in, 0, 1, 1);
 		bits.writeBinary(in, 1, 1, 1);

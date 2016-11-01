@@ -16,7 +16,7 @@ int[] a = ...; //an array of monotonically increasing integers;
 EliasFano ef = new EliasFano();
 int u = a[a.length - 1]; //the maximum value in a;
 int size = ef.getCompressedSize(u, a.length); //the size of the compressed array
-long[] compressed = new long[size];
+byte[] compressed = new byte[size];
 ef.compress(a, 0, a.length, compressed, 0);
 //decompress the array
 int[] b = new int[a.length];
@@ -42,7 +42,7 @@ for (int i = 1; i < a1.length; i++) a2[i]=a1[i]+a2[i-1];
 //compress a2
 int u = a2[a2.length-1]; //the max value in a2
 int size = ef.getCompressedSize(u, a2.length);
-long[] compressed = new long[size];
+byte[] compressed = new byte[size];
 ef.compress(a2, 0, a2.length, compressed, 0);
 //get the original i-th value of a1, as i-th minus (i-1)-th of a2
 int L = ef.getL(u, a2.length);

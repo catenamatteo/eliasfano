@@ -57,7 +57,7 @@ public class EliasFanoTest {
 		int s1 = ef.getCompressedSize(data1[data1.length-1], data1.length);
 		int s2 = ef.getCompressedSize(data2[data2.length-1], data2.length);
 		
-		long[] comp = new long[s1+s2];
+		byte[] comp = new byte[s1+s2];
 		int L1 = ef.getL(data1[data1.length-1], data1.length);
 		int L2 = ef.getL(data2[data2.length-1], data2.length);
 		int written = ef.compress(data1, 0, data1.length, comp, 0);
@@ -85,7 +85,7 @@ public class EliasFanoTest {
 		
 		int s1 = ef.getCompressedSize(data1[data1.length-2], data1.length-2);
 		
-		long[] comp = new long[s1+1];
+		byte[] comp = new byte[s1+1];
 		int L1 = ef.getL(data1[data1.length-2], data1.length-2);
 		ef.compress(data1, 1, data1.length-2, comp, 1);
 		
@@ -114,7 +114,7 @@ public class EliasFanoTest {
 		
 		int s2 = ef.getCompressedSize(data2[data2.length-1], data2.length);
 		
-		long[] comp = new long[s2];
+		byte[] comp = new byte[s2];
 		int L2 = ef.getL(data2[data2.length-1], data2.length);
 		ef.compress(data2, 0, data2.length, comp, 0);
 		
@@ -131,7 +131,7 @@ public class EliasFanoTest {
 
 		int s1 = ef.getCompressedSize(data1[data1.length-1], data1.length);
 		
-		long[] comp = new long[s1];
+		byte[] comp = new byte[s1];
 		int L1 = ef.getL(data1[data1.length-1], data1.length);
 		ef.compress(data1, 0, data1.length, comp, 0);
 		
@@ -171,7 +171,7 @@ public class EliasFanoTest {
 		
 		int s1 = ef.getCompressedSize(data1[data1.length-1], data1.length);
 		
-		long[] comp = new long[s1];
+		byte[] comp = new byte[s1];
 		int L1 = ef.getL(data1[data1.length-1], data1.length);
 		ef.compress(data1, 0, data1.length, comp, 0);
 		

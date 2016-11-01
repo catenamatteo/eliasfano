@@ -1,4 +1,4 @@
-package benchmark;
+package eu.nicecode.eliasfano.benchmark;
 
 import java.io.FileNotFoundException;
 import java.util.Arrays;

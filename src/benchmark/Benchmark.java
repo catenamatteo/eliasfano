@@ -10,7 +10,7 @@ import me.lemire.integercompression.synth.ClusteredDataGenerator;
  * 
  * Simple class meant to compare the speed of different schemes.
  * 
- * @author Daniel Lemire
+ * @author Daniel Lemire (refactored by Matteo Catena)
  * 
  */
 public class Benchmark {

@@ -166,17 +166,17 @@ public class EliasFano {
 
 		int startOffset = (int) (highBitsOffset / Byte.SIZE);
 		int offset = startOffset;
-		int prevSetBits = 0;
-		int setBits = 0;
-		while (setBits < idx + 1) {
+		int prev1Bits = 0;
+		int _1Bits = 0;
+		while (_1Bits < idx + 1) {
 
-			prevSetBits = setBits;
-			setBits += Integer.bitCount(in[offset++] & 0xFF);
+			prev1Bits = _1Bits;
+			_1Bits += Integer.bitCount(in[offset++] & 0xFF);
 		}
 		offset--; // rollback
-		int delta = ((offset - startOffset) * Byte.SIZE) - prevSetBits; // delta
+		int delta = ((offset - startOffset) * Byte.SIZE) - prev1Bits; // delta
 		int readFrom = offset * Byte.SIZE;
-		for (int i = 0; i < (idx + 1) - prevSetBits; i++) {
+		for (int i = 0; i < (idx + 1) - prev1Bits; i++) {
 
 			int high = bits.readUnary(in, readFrom);
 			delta += high;

@@ -9,7 +9,7 @@ Similarly, it permits to find the index of the first element in the compressed d
 greater or equal to a given value -- without decompressing the whole array.
 
 
-###Usage
+### Usage
 ```java
 int[] a = ...; //an array of monotonically increasing integers;
 //compress the array
@@ -28,7 +28,7 @@ int val = ef.get(compressed, 0, a.length, L, 3);
 int idx = ef.select(compressed, 0, a.length, L, 1000);
 ```
 
-####So, I can't use it to compress non-increasing arrays, isn't it?
+#### So, I can't use it to compress non-increasing arrays, isn't it?
 Sure you can! You just need to transform your array into a monotonically increasing one, 
 by adding to the i-th value the sum of the previous values in the array. Then, you can 
 recompute the original i-th element doing i-th minus (i-1)-th value.
@@ -49,10 +49,10 @@ int L = ef.getL(u, a2.length);
 int val = ef.get(compressed, 0, a2.length, L, i)-ef.get(compressed, 0, a2.length, L, i-1);
 ```
 
-###Dependecies 
+### Dependecies 
 * JUnit 4
 
-###References
+### References
 For a general understanding of the Elias-Fano technique, see:<br/>
 Sebastiano Vigna, "The Revenge of Elias and Fano" ([link](http://shonan.nii.ac.jp/seminar/029/wp-content/uploads/sites/12/2013/07/Sebastiano_Shonan.pdf))<br/>
 

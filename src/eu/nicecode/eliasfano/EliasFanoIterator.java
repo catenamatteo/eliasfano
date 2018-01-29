@@ -56,13 +56,13 @@ public class EliasFanoIterator implements Iterator<Integer> {
 
 	}
 	
-	@Override
+	
 	public boolean hasNext() {
 		
 		return idx < size;
 	}
 
-	@Override
+	
 	public Integer next() {
 		
 

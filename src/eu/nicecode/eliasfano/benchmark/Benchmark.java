@@ -9,6 +9,7 @@ import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.mahout.math.Varint;
 
@@ -47,7 +48,7 @@ public class Benchmark {
 
 		if (verbose) {
 			System.out.println("# EliasFano (stream)");
-			System.out.println("# memory footprint (bytes), intersect time (micros)");
+			System.out.println("# memory footprint (kb), intersection time (ms)");
 		}
 
 		int N = data.length;
@@ -70,7 +71,7 @@ public class Benchmark {
 
 		// This variable hold time in microseconds (10^-6).
 		long intersectTime = 0;
-		long totalsize = 0;
+		double totalsize = 0;
 
 		for (int r = 0; r < repeat; ++r) {
 			for (int k = 0; k < N; ++k) {
@@ -89,7 +90,7 @@ public class Benchmark {
 				EliasFanoIterator efi1 = new EliasFanoIterator(compressBuffer1, 0, data1.length, L1);
 
 				// intersect compressed data
-				long beforeIntersect = System.nanoTime() / 1000;
+				long beforeIntersect = System.nanoTime();
 
 				int[] c = new int[Math.min(data0.length, data1.length)];
 				int ci = 0;
@@ -120,10 +121,10 @@ public class Benchmark {
 				}
 
 				int[] intersect = Arrays.copyOfRange(c, 0, ci);
-				long afterIntersect = System.nanoTime() / 1000;
+				long afterIntersect = System.nanoTime();
 
 				// measure time of intersection.
-				intersectTime += afterIntersect - beforeIntersect;
+				intersectTime += TimeUnit.NANOSECONDS.toMillis(afterIntersect - beforeIntersect);
 				if (intersect.length != data[k][2].length)
 					throw new RuntimeException("we have a bug (diff length) " + "EliasFano expected "
 							+ data[k][2].length + " got " + intersect.length);
@@ -141,8 +142,8 @@ public class Benchmark {
 
 		if (verbose) {
 
-			double memoryfootprint = ((double) totalsize) / (data.length * repeat);
-			double intersectSpeed = ((double) intersectTime) / (data.length * repeat);
+			double memoryfootprint = (totalsize / (N * repeat)) / 1024.0;
+			double intersectSpeed = ((double) intersectTime) / (N * repeat);
 			System.out.println(String.format("\t%1$.2f\t%2$.2f", memoryfootprint, intersectSpeed));
 		}
 	}
@@ -153,7 +154,7 @@ public class Benchmark {
 
 		if (verbose) {
 			System.out.println("# " + codec.toString());
-			System.out.println("# memory footprint (bytes), intersection time (micros) ");
+			System.out.println("# memory footprint (kb), decompression + intersection time (ms) ");
 		}
 
 		int N = data.length;
@@ -174,7 +175,7 @@ public class Benchmark {
 
 		// This variable holds time in microseconds (10^-6).
 		long intersectTime = 0;
-		long totalsize = 0;
+		double totalsize = 0;
 
 		IntWrapper inpos0 = new IntWrapper();
 		IntWrapper outpos0 = new IntWrapper();
@@ -201,9 +202,9 @@ public class Benchmark {
 
 				final int thiscompsize0 = outpos0.get();
 				final int thiscompsize1 = outpos1.get();
-
+				
 				// uncompress and intersect data
-				long beforeIntersect = System.nanoTime() / 1000;
+				long beforeIntersect = System.nanoTime();
 				inpos0.set(0);
 				outpos0.set(0);
 				inpos1.set(0);
@@ -214,10 +215,10 @@ public class Benchmark {
 				Delta.fastinverseDelta(backupdata1);
 
 				int[] intersect = intersectSortedArrays(backupdata0, backupdata1);
-				long afterIntersect = System.nanoTime() / 1000;
+				long afterIntersect = System.nanoTime();
 
 				// measure time of intersection.
-				intersectTime += afterIntersect - beforeIntersect;
+				intersectTime += TimeUnit.NANOSECONDS.toMillis(afterIntersect - beforeIntersect);
 				if (intersect.length != data[k][2].length)
 					throw new RuntimeException("we have a bug (diff length) " + codec + " expected " + data[k][2].length
 							+ " got " + intersect.length);
@@ -235,8 +236,8 @@ public class Benchmark {
 
 		if (verbose) {
 
-			double memoryfootprint = (4.0 * totalsize) / (data.length * repeat);
-			double intersectSpeed = ((double) intersectTime) / (data.length * repeat);
+			double memoryfootprint = (( totalsize / (N * repeat)) * Integer.BYTES ) / 1024.0;
+			double intersectSpeed = ((double) intersectTime) / (N * repeat);
 			System.out.println(String.format("\t%1$.2f\t%2$.2f", memoryfootprint, intersectSpeed));
 		}
 	}
@@ -245,7 +246,7 @@ public class Benchmark {
 
 		if (verbose) {
 			System.out.println("# VariableByte (stream)");
-			System.out.println("# memory footprint (bytes), intersection time (micros) ");
+			System.out.println("# memory footprint (kb), decompression + intersection time (ms) ");
 		}
 
 		int N = data.length;
@@ -266,7 +267,7 @@ public class Benchmark {
 
 		// This variable holds time in microseconds (10^-6).
 		long intersectTime = 0;
-		long totalsize = 0;
+		double totalsize = 0;
 
 		for (int r = 0; r < repeat; ++r) {
 			for (int k = 0; k < N; ++k) {
@@ -295,7 +296,7 @@ public class Benchmark {
 				DataInput din1 = new DataInputStream(new ByteArrayInputStream(b1));
 
 				// intersect data
-				long beforeIntersect = System.nanoTime() / 1000;
+				long beforeIntersect = System.nanoTime();
 
 				int[] c = new int[Math.min(data0.length, data1.length)];
 				int ai = 0, bi = 0, ci = 0;
@@ -335,10 +336,10 @@ public class Benchmark {
 				}
 				int[] intersect = Arrays.copyOfRange(c, 0, ci);
 
-				long afterIntersect = System.nanoTime() / 1000;
+				long afterIntersect = System.nanoTime();
 
 				// measure time of intersection.
-				intersectTime += afterIntersect - beforeIntersect;
+				intersectTime += TimeUnit.NANOSECONDS.toMillis(afterIntersect - beforeIntersect);
 				if (intersect.length != data[k][2].length)
 					throw new RuntimeException("we have a bug (diff length) " + "VariableByte (stream) expected "
 							+ data[k][2].length + " got " + intersect.length);
@@ -356,8 +357,8 @@ public class Benchmark {
 
 		if (verbose) {
 
-			double memoryfootprint = (totalsize) / (data.length * repeat);
-			double intersectSpeed = ((double) intersectTime) / (data.length * repeat);
+			double memoryfootprint = (totalsize / (N * repeat))/1024.0;
+			double intersectSpeed = ((double) intersectTime) / (N * repeat);
 			System.out.println(String.format("\t%1$.2f\t%2$.2f", memoryfootprint, intersectSpeed));
 		}
 	}
@@ -377,7 +378,7 @@ public class Benchmark {
 		System.out.println("# 	 Softw. Pract. Exper.40, 2 (February 2010), 131-147. ");
 		System.out.println();
 
-		test(10, 18, 20);
+		test(10, 20, 20);
 	}
 
 	/**

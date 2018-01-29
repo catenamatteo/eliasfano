@@ -106,15 +106,20 @@ public class Bits {
 
 				val += Byte.SIZE - bitPosition;
 				bitOffset += Byte.SIZE - bitPosition;
-
-			} else {
-
-				val += (Byte.SIZE - (Integer.SIZE - Integer.numberOfLeadingZeros(x))) - bitPosition;
-				break;
-
+				
+				bitPosition = 0;
+				
+				while (in[longOffset + 1] == 0) {
+					
+					val += Byte.SIZE; 
+					bitOffset += Byte.SIZE;
+					longOffset += 1;
+				}
+				
+				x = in[longOffset + 1] & 0xFF;
 			}
+
+			return val + (Byte.SIZE - (Integer.SIZE - Integer.numberOfLeadingZeros(x))) - bitPosition;	
 		}
-		
-		return val;
 	}
 }

@@ -26,16 +26,13 @@ package eu.nicecode.eliasfano;
  * @author Matteo Catena
  *
  */
-public class EliasFano {
+public final class EliasFano {
 
-	private Bits bits;
-
-	public EliasFano() {
-
-		bits = new Bits();
+	private EliasFano() {
+		
 	}
 	
-	private long roundUp(long val, long den) {
+	static long roundUp(long val, final long den) {
 
 		val = val == 0 ? den : val;
 		return (val % den == 0) ? val : val + (den - (val % den));
@@ -52,7 +49,7 @@ public class EliasFano {
 	 *            the length of the array
 	 * @return the number of lower bits
 	 */
-	public int getL(int u, int length) {
+	public static int getL(final int u, final int length) {
 
 		long x = roundUp(u, length) / length;
 		return Integer.SIZE - Integer.numberOfLeadingZeros((int) (x - 1));
@@ -68,35 +65,30 @@ public class EliasFano {
 	 *            starting offset
 	 * @param length
 	 *            number of elements to compress
-	 * @param out
-	 *            the compressed array
-	 * @param outOffset
-	 *            starting offset
-	 * @return the number of written bytes
+	 * @return the compress values
 	 */
-	public int compress(int[] in, int inOffset, int length, byte[] out,
-			int outOffset) {
+	public static byte[] compress(final int[] in, final int inOffset, final int length) {
 
-		int u = in[inOffset + length - 1];
-		int l = getL(u, length);
+		final int u = in[inOffset + length - 1];
+		final int l = getL(u, length);
 
-		long lowBitsOffset = outOffset * Byte.SIZE;
-		long highBitsOffset = roundUp(lowBitsOffset + (l * length), Byte.SIZE);
+		final byte[] out = new byte[getCompressedSize(u, length)];
+		long lowBitsOffset = 0;
+		long highBitsOffset = roundUp(l * length, Byte.SIZE);
 
 		int prev = 0;
 		for (int i = 0; i < length; i++) {
 
-			int low = (0xFFFFFFFF >>> (Integer.SIZE - l)) & in[i + inOffset];
-			bits.writeBinary(out, lowBitsOffset, low, l);
+			int low = Bits.VAL_TO_WRITE[l] & in[i + inOffset];
+			Bits.writeBinary(out, lowBitsOffset, low, l);
 			lowBitsOffset += l;
 			int high = in[i + inOffset] >>> l;
-			bits.writeUnary(out, highBitsOffset, high - prev);
+			Bits.writeUnary(out, highBitsOffset, high - prev);
 			highBitsOffset += (high - prev) + 1;
 			prev = high;
 		}
 
-		return (int) (
-				roundUp(highBitsOffset, Byte.SIZE) / Byte.SIZE);
+		return out;
 
 	}
 
@@ -119,8 +111,8 @@ public class EliasFano {
 	 *            starting offset
 	 * @return the number of read bytes
 	 */
-	public int decompress(byte[] in, int inOffset, int length, int l,
-			int[] out, int outOffset) {
+	public static int decompress(final byte[] in, final int inOffset, final int length, final int l,
+			final int[] out, final int outOffset) {
 
 		long lowBitsOffset = inOffset * Byte.SIZE;
 		long highBitsOffset = roundUp(lowBitsOffset + (l * length), Byte.SIZE);
@@ -128,8 +120,8 @@ public class EliasFano {
 		int delta = 0;
 		for (int i = 0; i < length; i++) {
 
-			int low = bits.readBinary(in, lowBitsOffset, l);
-			int high = bits.readUnary(in, highBitsOffset);
+			final int low = Bits.readBinary(in, lowBitsOffset, l);
+			final int high = Bits.readUnary(in, highBitsOffset);
 			delta += high;
 			out[outOffset + i] = (delta << l) | low;
 			lowBitsOffset += l;
@@ -157,14 +149,14 @@ public class EliasFano {
 	 *            the index of the element to decompress
 	 * @return the value of the idx-th element
 	 */
-	public int get(byte[] in, int inOffset, int length, int l, int idx) {
+	public static int get(final byte[] in, final int inOffset, final int length, final int l, final int idx) {
 
-		long lowBitsOffset = inOffset * Byte.SIZE;
-		long highBitsOffset = roundUp(lowBitsOffset + (l * length), Byte.SIZE);
+		final long lowBitsOffset = inOffset * Byte.SIZE;
+		final long highBitsOffset = roundUp(lowBitsOffset + (l * length), Byte.SIZE);
 
-		int low = bits.readBinary(in, lowBitsOffset + (l * idx), l);
+		final int low = Bits.readBinary(in, lowBitsOffset + (l * idx), l);
 
-		int startOffset = (int) (highBitsOffset / Byte.SIZE);
+		final int startOffset = (int) (highBitsOffset / Byte.SIZE);
 		int offset = startOffset;
 		int prev1Bits = 0;
 		int _1Bits = 0;
@@ -178,7 +170,7 @@ public class EliasFano {
 		int readFrom = offset * Byte.SIZE;
 		for (int i = 0; i < (idx + 1) - prev1Bits; i++) {
 
-			int high = bits.readUnary(in, readFrom);
+			int high = Bits.readUnary(in, readFrom);
 			delta += high;
 			readFrom += high + 1;
 
@@ -205,14 +197,14 @@ public class EliasFano {
 	 *            value to select
 	 * @return the index of the first element equal or greater than {@code val}
 	 */
-	public int select(byte[] in, int inOffset, int length, int l, int val) {
+	public static int select(final byte[] in, final int inOffset, final int length, final int l, final int val) {
 
-		long lowBitsOffset = inOffset * Byte.SIZE;
-		long highBitsOffset = roundUp(lowBitsOffset + (l * length), Byte.SIZE);
+		final long lowBitsOffset = inOffset * Byte.SIZE;
+		final long highBitsOffset = roundUp(lowBitsOffset + (l * length), Byte.SIZE);
 
-		int h = val >>> l;
+		final int h = val >>> l;
 
-		int startOffset = (int) (highBitsOffset / Byte.SIZE);
+		final int startOffset = (int) (highBitsOffset / Byte.SIZE);
 		int offset = startOffset;
 		int prev1Bits = 0;
 		int _0Bits = 0;
@@ -227,10 +219,10 @@ public class EliasFano {
 		
 		offset = Math.max(offset - 1, startOffset); //conditional rollback
 
-		int low = bits.readBinary(in, lowBitsOffset + (l * prev1Bits), l);
+		int low = Bits.readBinary(in, lowBitsOffset + (l * prev1Bits), l);
 		int delta = ((offset - startOffset) * Byte.SIZE) - prev1Bits; // delta
 		int readFrom = offset * Byte.SIZE;
-		int high = bits.readUnary(in, readFrom);
+		int high = Bits.readUnary(in, readFrom);
 		delta += high;
 		readFrom += high + 1;
 
@@ -242,8 +234,8 @@ public class EliasFano {
 		
 			for (int i = prev1Bits + 1; i < length; i++) {
 		
-				low = bits.readBinary(in, lowBitsOffset + (l * i), l);
-				high = bits.readUnary(in, readFrom);
+				low = Bits.readBinary(in, lowBitsOffset + (l * i), l);
+				high = Bits.readUnary(in, readFrom);
 				delta += high;
 				readFrom += high + 1;
 		
@@ -276,9 +268,13 @@ public class EliasFano {
 	 *            value to rank
 	 * @return number of occurences of {@code val}
 	 */
-	public int rank(byte[] in, int inOffset, int length, int l, int val) {
+	public static int rank(final byte[] in, final int inOffset, final int length, final int l, final int val) {
 
-		int idx = select(in, inOffset, length, l, val);
+		/* TODO:
+		 * this implementation is particularly inefficient and it should be rewritten
+		 */
+		
+		final int idx = select(in, inOffset, length, l, val);
 
 		if (idx == -1) {
 
@@ -315,11 +311,11 @@ public class EliasFano {
 	 *            the size of the array to compress
 	 * @return the number of required bytes
 	 */
-	public int getCompressedSize(int u, int length) {
+	public static int getCompressedSize(final int u, final int length) {
 
-		int l = getL(u, length);
-		long numLowBits = roundUp(l * length, Byte.SIZE);
-		long numHighBits = roundUp(2 * length, Byte.SIZE);
+		final int l = getL(u, length);
+		final long numLowBits = roundUp(l * length, Byte.SIZE);
+		final long numHighBits = roundUp(2 * length, Byte.SIZE);
 		return (int) ((numLowBits + numHighBits) / Byte.SIZE);
 	}
 

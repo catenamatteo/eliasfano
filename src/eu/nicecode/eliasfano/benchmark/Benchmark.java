@@ -44,30 +44,12 @@ public class Benchmark {
 	 */
 	private static void testEF(int sparsity, int[][][] data, int repeat, boolean verbose) {
 
-		EliasFano ef = new EliasFano();
-
 		if (verbose) {
 			System.out.println("# EliasFano (stream)");
 			System.out.println("# memory footprint (kb), intersection time (ms)");
 		}
 
 		int N = data.length;
-
-		int maxLength = 0;
-		for (int k = 0; k < N; ++k) {
-			for (int j = 0; j < 3; j++) {
-				if (data[k][j].length == 0)
-					continue;
-				int len = ef.getCompressedSize(data[k][j][data[k][j].length - 1], data[k][j].length);
-				if (len > maxLength) {
-
-					maxLength = len;
-				}
-			}
-		}
-
-		byte[] compressBuffer0 = new byte[maxLength];
-		byte[] compressBuffer1 = new byte[maxLength];
 
 		// This variable hold time in microseconds (10^-6).
 		long intersectTime = 0;
@@ -80,12 +62,12 @@ public class Benchmark {
 				int[] data1 = data[k][1];
 
 				// compress data.
-				Arrays.fill(compressBuffer0, (byte) 0);
-				Arrays.fill(compressBuffer1, (byte) 0);
-				totalsize += ef.compress(data0, 0, data0.length, compressBuffer0, 0);
-				totalsize += ef.compress(data1, 0, data1.length, compressBuffer1, 0);
-				int L0 = ef.getL(data0[data0.length - 1], data0.length);
-				int L1 = ef.getL(data1[data1.length - 1], data1.length);
+				totalsize += EliasFano.getCompressedSize(data0[data0.length-1], data0.length);
+				byte[] compressBuffer0 = EliasFano.compress(data0, 0, data0.length);
+				totalsize += EliasFano.getCompressedSize(data1[data1.length-1], data1.length);
+				byte[] compressBuffer1 = EliasFano.compress(data1, 0, data1.length);
+				int L0 = EliasFano.getL(data0[data0.length - 1], data0.length);
+				int L1 = EliasFano.getL(data1[data1.length - 1], data1.length);
 				EliasFanoIterator efi0 = new EliasFanoIterator(compressBuffer0, 0, data0.length, L0);
 				EliasFanoIterator efi1 = new EliasFanoIterator(compressBuffer1, 0, data1.length, L1);
 
@@ -94,17 +76,17 @@ public class Benchmark {
 
 				int[] c = new int[Math.min(data0.length, data1.length)];
 				int ci = 0;
-				int a = efi0.next();
-				int b = efi1.next();
+				int a = efi0.nextPrimitiveInt();
+				int b = efi1.nextPrimitiveInt();
 				while (true) {
 					if (a < b) {
 						if (efi0.hasNext())
-							a = efi0.next(b);
+							a = efi0.nextPrimitiveInt(b);
 						else
 							break;
 					} else if (a > b) {
 						if (efi1.hasNext())
-							b = efi1.next(a);
+							b = efi1.nextPrimitiveInt(a);
 						else
 							break;
 					} else {
@@ -112,8 +94,8 @@ public class Benchmark {
 							c[ci++] = a;
 						}
 						if (efi0.hasNext() && efi1.hasNext()) {
-							a = efi0.next();
-							b = efi1.next();
+							a = efi0.nextPrimitiveInt();
+							b = efi1.nextPrimitiveInt();
 						} else {
 							break;
 						}

@@ -8,7 +8,7 @@ import java.util.Iterator;
  * @author Matteo Catena
  *
  */
-public class EliasFanoIterator implements Iterator<Integer> {
+public class EliasFanoIterator implements Iterator<Integer>, Iterable<Integer> {
 
 	private int idx = 0;
 	private int curr = -1;
@@ -16,12 +16,10 @@ public class EliasFanoIterator implements Iterator<Integer> {
 	private long inOffset;
 	private long highBitsOffset;
 	private long lowBitsOffset;
-	
-	private Bits bits;
-	
-	private byte[] in;
-	private int size;
-	private int l;
+		
+	private final byte[] in;
+	private final int size;
+	private final int l;
 	private int delta = 0;
 	
 	/**
@@ -41,33 +39,25 @@ public class EliasFanoIterator implements Iterator<Integer> {
 		
 		this.inOffset = inOffset;
 		lowBitsOffset = inOffset * Byte.SIZE;
-		highBitsOffset = roundUp(lowBitsOffset + (l * size), Byte.SIZE);
-
-		bits = new Bits();
-	}
-	
-	/*
-	 * TODO: factorize this method
-	 */
-	private long roundUp(long val, long den) {
-
-		val = val == 0 ? den : val;
-		return (val % den == 0) ? val : val + (den - (val % den));
+		highBitsOffset = EliasFano.roundUp(lowBitsOffset + (l * size), Byte.SIZE);
 
 	}
-	
 	
 	public boolean hasNext() {
 		
 		return idx < size;
 	}
 
-	
-	public Integer next() {
+	/**
+	 * Returns the next element in the iteration,
+	 * but as a primitive int (this should be faster.)
+	 * 
+	 * @return the next element in the iteration
+	 */
+	public final int nextPrimitiveInt() {
 		
-
-		int low = bits.readBinary(in, lowBitsOffset, l);
-		int high = bits.readUnary(in, highBitsOffset);
+		final int low = Bits.readBinary(in, lowBitsOffset, l);
+		final int high = Bits.readUnary(in, highBitsOffset);
 		delta += high;
 		lowBitsOffset += l;
 		highBitsOffset += high + 1;
@@ -75,23 +65,30 @@ public class EliasFanoIterator implements Iterator<Integer> {
 		idx++;
 		return curr = ((delta << l) | low);
 	}
-
+	
+	@Override
+	public final Integer next() {
+		
+		return nextPrimitiveInt();
+	}
+	
 	/**
 	 * Returns the next value, in the iterator, greater or equal than {@code val}.
 	 * If there is no such element, the iterator reaches its end and returns -1.
+	 * This returns a primitive int, as it should be faster.
 	 * 
 	 * @param val
 	 * @return
 	 */
-	public Integer next(int val) {
+	public int nextPrimitiveInt(final int val) {
 	
 		if (val < curr)
 			return next();
 		
-		int h = val >>> l;
+		final int h = val >>> l;
 		do {
 		
-			int high = bits.readUnary(in, highBitsOffset);
+			final int high = Bits.readUnary(in, highBitsOffset);
 			delta += high;
 			highBitsOffset += high + 1;
 			idx++;
@@ -99,8 +96,8 @@ public class EliasFanoIterator implements Iterator<Integer> {
 		} while (delta < h && hasNext());
 		
 		lowBitsOffset = (inOffset * Byte.SIZE) + (l * (idx - 1));
-		int low = bits.readBinary(in, lowBitsOffset, l);
-		lowBitsOffset += l;
+		final int low = Bits.readBinary(in, lowBitsOffset, l);
+		lowBitsOffset += l;		
 		int tmp = ((delta << l) | low);
 		
 		while (tmp < val && hasNext()) {
@@ -111,5 +108,23 @@ public class EliasFanoIterator implements Iterator<Integer> {
 		if (tmp < val) tmp = -1;
 		
 		return curr = tmp;
+	}	
+
+	/**
+	 * Returns the next value, in the iterator, greater or equal than {@code val}.
+	 * If there is no such element, the iterator reaches its end and returns -1.
+	 * 
+	 * @param val
+	 * @return
+	 */
+	public final Integer next(int val) {
+	
+		return nextPrimitiveInt(val);
+	}
+
+	@Override
+	public final Iterator<Integer> iterator() {
+		
+		return this;
 	}
 }

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.nicecode</groupId>
 	<artifactId>eliasfano</artifactId>
-	<version>0.0.1.2</version>
+	<version>0.0.2</version>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<testSourceDirectory>test</testSourceDirectory>

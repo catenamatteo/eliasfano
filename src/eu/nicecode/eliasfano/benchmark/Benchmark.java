@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.mahout.math.Varint;
 
+import eu.nicecode.eliasfano.Bits;
 import eu.nicecode.eliasfano.EliasFano;
 import eu.nicecode.eliasfano.EliasFanoIterator;
 import me.lemire.integercompression.BinaryPacking;

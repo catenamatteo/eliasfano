@@ -45,7 +45,7 @@ public final class Bits {
 				0b00000001 };
 	}
 
-	public static void writeBinary(final byte[] in, long bitOffset, int val, int numbits) {
+	static void writeBinary(final byte[] in, long bitOffset, int val, int numbits) {
 
 		while (numbits > 0) {
 
@@ -71,7 +71,7 @@ public final class Bits {
 		}
 	}
 
-	public static int readBinary(final byte[] in, long bitOffset, int numbits) {
+	static int readBinary(final byte[] in, long bitOffset, int numbits) {
 
 		int val = 0;
 
@@ -94,10 +94,10 @@ public final class Bits {
 			numbits -= bitsToRead;
 		}
 
-		return (int) val;
+		return val;
 	}
 
-	public static void writeUnary(final byte[] in, long bitOffset, int val) {
+	static void writeUnary(final byte[] in, long bitOffset, int val) {
 
 		while (val > 0) {
 
@@ -118,7 +118,7 @@ public final class Bits {
 		in[longOffset] |= ONE[bitPosition];
 	}
 
-	public static int readUnary(final byte[] in, long bitOffset) {
+	static int readUnary(final byte[] in, long bitOffset) {
 
 		int val = 0;
 
@@ -134,13 +134,7 @@ public final class Bits {
 		} else {
 
 			val += Byte.SIZE - bitPosition;
-
-			while (in[longOffset + 1] == 0) {
-
-				val += Byte.SIZE;
-				longOffset++;
-			}
-
+			for (;in[longOffset+1] == 0; longOffset++) val+= Byte.SIZE;
 			x = in[longOffset + 1] & 0xFF;
 		}
 		
